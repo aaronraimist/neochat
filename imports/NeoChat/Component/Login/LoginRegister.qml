@@ -14,7 +14,7 @@ import org.kde.neochat 1.0
 
 import NeoChat.Component.Login 1.0
 
-LoginSteep {
+LoginStep {
     id: loginRegister
 
     Layout.alignment: Qt.AlignHCenter

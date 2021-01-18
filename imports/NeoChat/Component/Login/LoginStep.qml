@@ -8,18 +8,18 @@ import QtQuick.Layouts 1.14
 
 /// Step for the login/registration flow
 ColumnLayout {
-    id: abstractSteep
+    id: abstractStep
     property string title: i18n("Welcome")
     property bool showContinueButton: false
     property bool acceptable: false
     property url nextUrl: null
     property Button continueButton: Button {
         text: i18nc("@action:button", "Continue")
-        enabled: abstractSteep.acceptable
-        visible: abstractSteep.showContinueButton
+        enabled: abstractStep.acceptable
+        visible: abstractStep.showContinueButton
         Layout.alignment: Qt.AlignHCenter
         onClicked: {
-            abstractSteep.process()
+            abstractStep.process()
             module.source = module.item.nextUrl
         }
     }
@@ -28,7 +28,7 @@ ColumnLayout {
     /// Should call \sa processed when it finish successfully.
     property Action action: null
 
-    /// Called when swiching to the next steep.
+    /// Called when swiching to the next step.
     signal processed(url nextUrl)
 
     signal message(string message)

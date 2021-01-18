@@ -13,7 +13,7 @@ import NeoChat.Component 1.0
 
 import org.kde.kirigami 2.12 as Kirigami
 
-LoginSteep {
+LoginStep {
     id: root
 
     property bool loading: false

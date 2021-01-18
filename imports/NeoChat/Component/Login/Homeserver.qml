@@ -12,7 +12,7 @@ import org.kde.kirigami 2.12 as Kirigami
 
 import org.kde.neochat 1.0
 
-LoginSteep {
+LoginStep {
     id: root
 
     readonly property var homeserver: customHomeserver.visible ? customHomeserver.text : serverCombo.currentText

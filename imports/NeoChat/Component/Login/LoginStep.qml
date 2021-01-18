@@ -28,7 +28,7 @@ ColumnLayout {
     /// Should call \sa processed when it finish successfully.
     property Action action: null
 
-    /// Called when swiching to the next step.
+    /// Called when switching to the next step.
     signal processed(url nextUrl)
 
     signal message(string message)

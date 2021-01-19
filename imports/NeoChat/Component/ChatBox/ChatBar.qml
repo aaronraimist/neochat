@@ -28,15 +28,15 @@ Loader {
         ToolBar {
             id: chatBar
 
-            property alias isAutoCompleting: completionMenu.visible
-            property alias autoCompleteModel: completionMenu.autoCompleteModel
-            property alias autoCompleteBeginPosition: completionMenu.autoCompleteBeginPosition
-            property alias autoCompleteEndPosition: completionMenu.autoCompleteEndPosition
+            property alias isCompleting: completionMenu.visible
+            property alias completionModel: completionMenu.model
+            property alias completionBeginPosition: completionMenu.beginPosition
+            property alias completionEndPosition: completionMenu.endPosition
 
             // store each user we autoComplete here, this will be helpful later to generate
             // the matrix.to links.
             // This use an hack to define: https://doc.qt.io/qt-5/qml-var.html#property-value-initialization-semantics
-            property var userAutocompleted: ({})
+            property var userCompleted: ({})
 
             position: ToolBar.Footer
             Kirigami.Theme.inherit: true
@@ -125,10 +125,10 @@ Loader {
                         }
 
                         Keys.onReturnPressed: {
-                            if (isAutoCompleting) {
-                                chatBar.autoComplete();
+                            if (isCompleting) {
+                                chatBar.complete();
 
-                                isAutoCompleting = false;
+                                isCompleting = false;
                                 return;
                             }
                             if (event.modifiers & Qt.ShiftModifier) {
@@ -157,7 +157,7 @@ Loader {
                                 switchRoomUp();
                                 return;
                             }
-                            if (isAutoCompleting) {
+                            if (isCompleting) {
                                 autoCompleteListView.decrementCurrentIndex();
                             }
                         }
@@ -167,7 +167,7 @@ Loader {
                                 switchRoomDown();
                                 return;
                             }
-                            if (!isAutoCompleting) {
+                            if (!isCompleting) {
                                 return;
                             }
 
@@ -181,7 +181,7 @@ Loader {
                                 autoAppeared = false;
                             }
 
-                            chatBar.autoComplete();
+                            chatBar.complete();
                         }
 
                         Connections {
@@ -197,31 +197,31 @@ Loader {
                             currentRoom.cachedInput = text
                             autoAppeared = false;
 
-                            const autocompletionInfo = documentHandler.getAutocompletionInfo();
+                            const completionInfo = documentHandler.getAutocompletionInfo();
 
-                            if (autocompletionInfo.type === ChatDocumentHandler.Ignore) {
+                            if (completionInfo.type === ChatDocumentHandler.Ignore) {
                                 return;
                             }
-                            if (autocompletionInfo.type === ChatDocumentHandler.None) {
-                                isAutoCompleting = false;
+                            if (completionInfo.type === ChatDocumentHandler.None) {
+                                isCompleting = false;
                                 autoCompleteListView.currentIndex = 0;
                                 return;
                             }
 
-                            if (autocompletionInfo.type === ChatDocumentHandler.User) {
-                                autoCompleteModel = currentRoom.getUsers(autocompletionInfo.keyword);
+                            if (completionInfo.type === ChatDocumentHandler.User) {
+                                completionModel = currentRoom.getUsers(completionInfo.keyword);
                             } else {
-                                autoCompleteModel = emojiModel.filterModel(autocompletionInfo.keyword);
+                                completionModel = emojiModel.filterModel(completionInfo.keyword);
                             }
 
-                            if (autoCompleteModel.length === 0) {
-                                isAutoCompleting = false;
+                            if (completionModel.length === 0) {
+                                isCompleting = false;
                                 autoCompleteListView.currentIndex = 0;
                                 return;
                             }
-                            isAutoCompleting = true
+                            isCompleting = true
                             autoAppeared = true;
-                            autoCompleteEndPosition = cursorPosition
+                            completionEndPosition = cursorPosition
                         }
                     }
                 }
@@ -332,7 +332,7 @@ Loader {
 
             function postMessage() {
                 roomManager.actionsHandler.postMessage(inputField.text.trim(), attachmentPath,
-                    replyEventId, editEventId, chatBar.userAutocompleted);
+                    replyEventId, editEventId, chatBar.userCompleted);
                 currentRoom.markAllMessagesAsRead();
                 inputField.clear();
                 inputField.text = Qt.binding(() => {
@@ -341,11 +341,11 @@ Loader {
                 root.messageSent()
             }
 
-            function autoComplete() {
+            function complete() {
                 documentHandler.replaceAutoComplete(autoCompleteListView.currentItem.displayText)
                 // Unfortunally it doesn't
                 if (!autoCompleteListView.currentItem.isEmoji) {
-                    chatBar.userAutocompleted[completionMenu.contentChildren[completionMenu.currentIndex].displayText] = autoCompleteListView.currentItem.userId;
+                    chatBar.userCompleted[completionMenu.contentChildren[completionMenu.currentIndex].displayText] = autoCompleteListView.currentItem.userId;
                 }
             }
         }

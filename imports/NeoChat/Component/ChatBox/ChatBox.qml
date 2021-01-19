@@ -45,6 +45,10 @@ Item {
         }
         return h
     }
+    
+    // For some reason, this is needed to make the height animation work even though
+    // it used to work and height should be directly affected by implicitHeight
+    height: implicitHeight
 
     Behavior on height {
         NumberAnimation {

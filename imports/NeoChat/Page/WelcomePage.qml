@@ -55,7 +55,7 @@ Kirigami.ScrollablePage {
         Loader {
             id: module
             Layout.alignment: Qt.AlignHCenter
-            source: "qrc:/imports/NeoChat/Component/Login/LoginRegister.qml"
+            source: "qrc:/imports/NeoChat/Component/Login/Login.qml"
         }
 
         Connections {

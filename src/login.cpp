@@ -29,6 +29,44 @@ void Login::init()
     m_supportsSso = false;
     m_supportsPassword = false;
     m_ssoUrl = QUrl();
+
+    connect(this, &Login::matrixIdChanged, this, [=](){
+        m_testing = true;
+        Q_EMIT testingChanged();
+        setHomeserverReachable(false);
+        if (m_currentTestJob) {
+            m_currentTestJob->abandon();
+            m_currentTestJob = nullptr;
+        }
+        QString _matrixId(m_matrixId);
+        if (!_matrixId.startsWith('@')) {
+            _matrixId.prepend('@');
+        }
+        if (m_connection) {
+            delete m_connection;
+            m_connection = nullptr;
+        }
+        m_connection = new Connection(this);
+        m_connection->resolveServer(_matrixId);
+        auto job = m_connection->callApi<GetWellknownJob>();
+        m_currentTestJob = job;
+        connect(job, &BaseJob::result, this, [=]() {
+            m_connection->setHomeserver(job->data().homeserver.baseUrl);
+            connect(m_connection, &Connection::loginFlowsChanged, this, [=]() {
+                setHomeserverReachable(m_connection->isUsable());
+                m_currentTestJob = nullptr;
+                m_supportsSso = m_connection->supportsSso();
+                m_supportsPassword = m_connection->supportsPasswordAuth();
+                Q_EMIT loginFlowsChanged();
+                m_testing = false;
+                Q_EMIT testingChanged();
+            });
+        });
+        connect(job, &BaseJob::failure, this, [=]() {
+            m_testing = false;
+            Q_EMIT testingChanged();
+        });
+    });
 }
 
 void Login::setHomeserverReachable(bool reachable)
@@ -40,40 +78,6 @@ void Login::setHomeserverReachable(bool reachable)
 bool Login::homeserverReachable() const
 {
     return m_homeserverReachable;
-}
-
-void Login::testHomeserver(QString matrixId)
-{
-    setHomeserverReachable(false);
-    if (m_currentTestJob) {
-        m_currentTestJob->abandon();
-        m_currentTestJob = nullptr;
-    }
-    if (!matrixId.startsWith('@')) {
-        matrixId.prepend('@');
-    }
-    if (m_connection) {
-        delete m_connection;
-        m_connection = nullptr;
-    }
-    m_connection = new Connection(this);
-    m_connection->resolveServer(matrixId);
-    auto job = m_connection->callApi<GetWellknownJob>();
-    m_currentTestJob = job;
-    connect(job, &BaseJob::result, this, [=]() {
-        m_connection->setHomeserver(job->data().homeserver.baseUrl);
-        connect(m_connection, &Connection::loginFlowsChanged, this, [=]() {
-            setHomeserverReachable(m_connection->isUsable());
-            m_currentTestJob = nullptr;
-            m_supportsSso = m_connection->supportsSso();
-            m_supportsPassword = m_connection->supportsPasswordAuth();
-            Q_EMIT loginFlowsChanged();
-            Q_EMIT testHomeserverFinished();
-        });
-    });
-    connect(job, &BaseJob::failure, this, [=]() {
-        Q_EMIT testHomeserverFinished();
-    });
 }
 
 QString Login::matrixId() const
@@ -119,6 +123,7 @@ void Login::login()
     connect(m_connection, &Connection::loginFlowsChanged, this, [=]() {
         m_connection->loginWithPassword(m_matrixId, m_password, m_deviceName, "");
         connect(m_connection, &Connection::connected, this, [=] {
+            Q_EMIT connected();
             AccountSettings account(m_connection->userId());
             account.setKeepLoggedIn(true);
             account.clearAccessToken(); // Drop the legacy - just in case
@@ -136,7 +141,7 @@ void Login::login()
             Q_EMIT Controller::instance().globalErrorOccured(i18n("Network Error"), std::move(error));
         });
         connect(m_connection, &Connection::loginError, [=](QString error, const QString &) {
-            Q_EMIT errorOccured(i18n("Login Failed"));
+            Q_EMIT errorOccured(i18n("Login Failed: %1", error));
         });
     });
 
@@ -189,4 +194,9 @@ void Login::loginWithSso()
         Q_EMIT initialSyncFinished();
         disconnect(m_connection, &Connection::syncDone, this, nullptr);
     });
+}
+
+bool Login::testing() const
+{
+    return m_testing;
 }

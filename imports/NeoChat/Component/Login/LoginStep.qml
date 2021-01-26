@@ -11,18 +11,9 @@ ColumnLayout {
     id: abstractStep
     property string title: i18n("Welcome")
     property bool showContinueButton: false
+    property bool showBackButton: false
     property bool acceptable: false
-    property url nextUrl: null
-    property Button continueButton: Button {
-        text: i18nc("@action:button", "Continue")
-        enabled: abstractStep.acceptable
-        visible: abstractStep.showContinueButton
-        Layout.alignment: Qt.AlignHCenter
-        onClicked: {
-            abstractStep.process()
-            module.source = module.item.nextUrl
-        }
-    }
+    property string previousUrl: ""
 
     /// Process this module, this is called by the continue button.
     /// Should call \sa processed when it finish successfully.
@@ -33,5 +24,4 @@ ColumnLayout {
 
     signal message(string message)
 
-    Layout.alignment: Qt.AlignHCenter
 }

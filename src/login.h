@@ -18,6 +18,7 @@ class Login : public QObject
     Q_OBJECT
 
     Q_PROPERTY(bool homeserverReachable READ homeserverReachable NOTIFY homeserverReachableChanged)
+    Q_PROPERTY(bool testing READ testing NOTIFY testingChanged)
     Q_PROPERTY(QString matrixId READ matrixId WRITE setMatrixId NOTIFY matrixIdChanged)
     Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
     Q_PROPERTY(QString deviceName READ deviceName WRITE setDeviceName NOTIFY deviceNameChanged)
@@ -31,7 +32,6 @@ public:
     Q_INVOKABLE void init();
 
     bool homeserverReachable() const;
-    Q_INVOKABLE void testHomeserver(QString matrixId);
 
     QString matrixId() const;
     void setMatrixId(const QString &matrixId);
@@ -44,6 +44,8 @@ public:
 
     bool supportsPassword() const;
     bool supportsSso() const;
+
+    bool testing() const;
 
     QUrl ssoUrl() const;
 
@@ -61,6 +63,7 @@ Q_SIGNALS:
     void ssoUrlChanged();
     void connected();
     void errorOccured(QString message);
+    void testingChanged();
 
 private:
     void setHomeserverReachable(bool reachable);
@@ -74,4 +77,5 @@ private:
     bool m_supportsPassword = false;
     Connection *m_connection = nullptr;
     QUrl m_ssoUrl;
+    bool m_testing;
 };

@@ -17,6 +17,8 @@ import NeoChat.Component.Login 1.0
 Kirigami.ScrollablePage {
     id: welcomePage
 
+    property alias currentStep: module.item
+
     title: module.item.title ?? i18n("Welcome")
 
     header: Controls.Control {
@@ -57,9 +59,30 @@ Kirigami.ScrollablePage {
             Layout.alignment: Qt.AlignHCenter
             source: "qrc:/imports/NeoChat/Component/Login/Login.qml"
         }
+        RowLayout {
+            Layout.alignment: Qt.AlignHCenter
+
+            Controls.Button {
+                text: i18nc("@action:button", "Back")
+
+                visible: welcomePage.currentStep.showBackButton
+                Layout.alignment: Qt.AlignHCenter
+                onClicked: {
+                    module.source = welcomePage.currentStep.previousUrl
+                }
+            }
+
+            Controls.Button {
+                id: continueButton
+                enabled: welcomePage.currentStep.acceptable
+                visible: welcomePage.currentStep.showContinueButton
+                action: welcomePage.currentStep.action
+            }
+        }
 
         Connections {
-            target: module.item
+            target: currentStep
+
             function onProcessed(nextUrl) {
                 module.source = nextUrl;
             }

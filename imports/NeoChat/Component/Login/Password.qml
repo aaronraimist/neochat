@@ -18,6 +18,7 @@ LoginStep {
     id: root
 
     title: i18nc("@title", "Password")
+    message: i18n("Enter your password")
     showContinueButton: true
     showBackButton: true
     previousUrl: LoginHelper.supportsSso ? "qrc:/imports/NeoChat/Component/Login/LoginMethod.qml" : "qrc:/imports/NeoChat/Component/Login/Login.qml"

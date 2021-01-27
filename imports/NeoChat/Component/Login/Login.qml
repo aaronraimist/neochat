@@ -17,12 +17,11 @@ import NeoChat.Component 1.0
 LoginStep {
     id: root
 
-    property bool loading: false
-
     showContinueButton: true
     showBackButton: false
 
     title: i18nc("@title", "Login")
+    message: i18n("Enter your Matrix ID")
 
     Kirigami.FormLayout {
         QQC2.TextField {
@@ -30,7 +29,9 @@ LoginStep {
             Kirigami.FormData.label: i18n("Matrix ID:")
             placeholderText: "@user:matrix.org"
             onTextChanged: {
-                LoginHelper.matrixId = text
+                if(acceptableInput) {
+                    LoginHelper.matrixId = text
+                }
             }
 
             validator: RegularExpressionValidator {
@@ -40,9 +41,8 @@ LoginStep {
     }
 
     action: Kirigami.Action {
-        text: LoginHelper.testing ? i18n("Loading") : i18nc("@action:button", "Continue")
+        text: LoginHelper.testing && matrixIdField.acceptableInput ? i18n("Loading") : i18nc("@action:button", "Continue")
         onTriggered: {
-            LoginHelper.matrixId = matrixIdField.text
             if (LoginHelper.supportsSso && LoginHelper.supportsPassword) {
                 processed("qrc:/imports/NeoChat/Component/Login/LoginMethod.qml");
             } else if (LoginHelper.supportsPassword) {

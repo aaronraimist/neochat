@@ -8,8 +8,9 @@ import QtQuick.Layouts 1.14
 
 /// Step for the login/registration flow
 ColumnLayout {
-    id: abstractStep
+
     property string title: i18n("Welcome")
+    property string message: i18n("Welcome")
     property bool showContinueButton: false
     property bool showBackButton: false
     property bool acceptable: false
@@ -22,6 +23,6 @@ ColumnLayout {
     /// Called when switching to the next step.
     signal processed(url nextUrl)
 
-    signal message(string message)
+    signal showMessage(string message)
 
 }

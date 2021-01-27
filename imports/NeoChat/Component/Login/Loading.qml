@@ -16,6 +16,7 @@ import org.kde.kirigami 2.12 as Kirigami
 QQC2.BusyIndicator {
 
     property var showContinueButton: false
+    property var showBackButton: false
     property string title: i18n("Loading")
 
     anchors.centerIn: parent

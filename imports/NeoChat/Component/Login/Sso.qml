@@ -16,7 +16,9 @@ import org.kde.kirigami 2.12 as Kirigami
 
 LoginStep {
     id: root
-    title: i18nc("@title", "Login with single sign-on")
+
+    title: i18nc("@title", "Login")
+    message: i18n("Login with single sign-on")
 
     Kirigami.FormLayout {
         Connections {
@@ -31,7 +33,7 @@ LoginStep {
             text: i18n("Login")
             onClicked: {
                 LoginHelper.loginWithSso()
-                root.message(i18n("Complete the autentification steps in your browser"))
+                root.showMessage(i18n("Complete the authentification steps in your browser"))
             }
         }
     }

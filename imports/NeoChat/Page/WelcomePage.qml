@@ -51,7 +51,7 @@ Kirigami.ScrollablePage {
             Layout.fillWidth: true
             horizontalAlignment: Text.AlignHCenter
             font.pixelSize: 25
-            text: module.item.title ?? i18n("Welcome to Matrix")
+            text: module.item.message ?? module.item.title ?? i18n("Welcome to Matrix")
         }
 
         Loader {
@@ -86,7 +86,7 @@ Kirigami.ScrollablePage {
             function onProcessed(nextUrl) {
                 module.source = nextUrl;
             }
-            function onMessage(message) {
+            function onShowMessage(message) {
                 headerMessage.text = message;
                 headerMessage.visible = true;
                 headerMessage.type = Kirigami.MessageType.Information;
